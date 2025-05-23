@@ -90,32 +90,39 @@ const uploadFileWithRetry = async (file, fileName, retries = 3) => {
  * Garde le même nom que dans le code original
  */
 const UploadImage = (req, res, next) => {
-  if (!req.image ) {console.log("kjdkjsdkj"); return next();}
+  if (!req.files || !req.files.image) {
+    return res.status(400).json({ error: 'No image uploaded' });
+  }
 
-  
-  const files = req.image;
+  const files = req.files;
   const uploadedFiles = {};
 
   const uploadPromises = Object.keys(files).map((fieldName) => {
     const file = files[fieldName][0];
-    
-    const remotePath = Date.now()+`.${file.originalname.split(".").pop()}`;
+    const remoteFileName = Date.now() + `.${file.originalname.split(".").pop()}`;
 
-    return uploadFileWithRetry(file, remotePath).then((fileUrl) => {
-      uploadedFiles[fieldName] = fileUrl;
+    return uploadFileWithRetry(file, remoteFileName).then((fileUrl) => {
+      uploadedFiles[fieldName] = {
+        fileName: remoteFileName,
+        url: fileUrl,
+      };
     });
   });
 
   Promise.all(uploadPromises)
     .then(() => {
-      req.uploadedFiles = uploadedFiles;
-      res.locals.uploadedFiles = uploadedFiles;
-      next();
+      const imageField = uploadedFiles.image;
+      return res.status(200).json({
+        success: true,
+        message: "Image uploaded successfully",
+        imageUrl: imageField ? imageField.url : null,
+      });
     })
     .catch((error) => {
-      console.error("⛔ Échec de l'upload des fichiers:", error);
-      res.status(500).send({ error: "L'upload des fichiers a échoué" });
+      console.error("⛔ Upload failed:", error);
+      return res.status(500).json({ error: "Image upload failed" });
     });
 };
+
 
 module.exports = UploadImage;
