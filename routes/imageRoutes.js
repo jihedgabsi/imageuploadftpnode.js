@@ -13,9 +13,10 @@ const Multer = multer({
 
 
 
-// Handle single image upload
-router.post('/upload',  Multer.fields([
-    { name: "image", maxCount: 1 },UploadImage,
-  ]),);
+router.post(
+  '/upload',
+  Multer.fields([{ name: "image", maxCount: 100 }]),
+  UploadImage
+);
 
 module.exports = router;
