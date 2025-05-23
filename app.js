@@ -4,6 +4,7 @@ const fs = require('fs');
 
 const errorHandler = require('./middleware/errorHandler');
 const afficheimage = require("./services/affiche");
+const uploadimage = require("./routes/imageRoutes");
 
 const app = express();
 
@@ -16,7 +17,7 @@ if (!fs.existsSync(uploadDir)) {
 app.use("/afficheimage", afficheimage);
 
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('uploads',uploadimage);
 
 
 
