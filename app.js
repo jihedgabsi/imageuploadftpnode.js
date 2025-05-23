@@ -17,7 +17,7 @@ if (!fs.existsSync(uploadDir)) {
 app.use("/afficheimage", afficheimage);
 
 
-app.use('uploads',uploadimage);
+app.use('/uploads',uploadimage);
 
 
 
